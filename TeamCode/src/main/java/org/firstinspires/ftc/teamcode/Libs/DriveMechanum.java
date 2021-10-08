@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Libs;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HWProfile.HWProfile;
@@ -28,7 +28,7 @@ public class DriveMechanum {
         double theta = Math.toRadians(90 + heading);
         ElapsedTime runtime = new ElapsedTime();
 
-        if(runtime.time() >= duration) active = false
+        if(runtime.time() >= duration) active = false;
 
         updateValues(action, initZ, theta, currentZ, zCorrection);
 
@@ -42,18 +42,92 @@ public class DriveMechanum {
 
             currentZ = getZAngle();
             if (currentZ != initZ){
-                zCorrection = Math.abs(initZ - currentZ);
+                zCorrection = Math.abs(initZ - currentZ)/100;
 
-                if (heading > 180 && heading < 359.999999){
-
+                if (heading > 180 && heading < 359.999999) {
+                    if (currentZ > initZ) {
+                        RF = RF - zCorrection;
+                        LF = LF + zCorrection;
+                        LR = LR + zCorrection;
+                        RR = RR - zCorrection;
+                        action = "(heading > 180 && currentZ > initZ";
+                    } // end of if currentZ > initZ
+                    if (currentZ < initZ) {
+                        RF = RF + zCorrection;
+                        LF = LF - zCorrection;
+                        LR = LR - zCorrection;
+                        RR = RR + zCorrection;
+                        action = "(heading < 180 && currentZ < initZ";
+                    } // end of if currentZ < initZ
                 }   // end of if heading > 180 && heading < 359.999999
 
-                /*
-                 * Current vid stopping point at 57:06
-                 */
+                if (heading > 0 && heading < 180){
+                    if(currentZ > initZ){
+                        RF = RF + zCorrection;
+                        LF = LF + zCorrection;
+                        LR = LR - zCorrection;
+                        RR = RR - zCorrection;
+                        action = "(heading < 180 && currentZ > initZ";
+                    } // end of if currentZ > initZ
+                    if (currentZ < initZ) {
+                        RF = RF - zCorrection;
+                        LF = LF - zCorrection;
+                        LR = LR + zCorrection;
+                        RR = RR + zCorrection;
+                        action = "(heading == 0 && currentZ < initZ";
+                    } // end of if currentZ < initZ
+                }   // end of if heading > 180 && heading < 359.999999
+
+                if(heading == 0){
+                    if(currentZ > initZ){
+                        RF = RF - zCorrection;
+                        LF = LF + zCorrection;
+                        LR = LR + zCorrection;
+                        RR = RR - zCorrection;
+                        action = "(heading == 0 && currentZ > initZ";
+                    } // end of if currentZ > initZ
+                    if (currentZ < initZ) {
+                        RF = RF + zCorrection;
+                        LF = LF - zCorrection;
+                        LR = LR - zCorrection;
+                        RR = RR + zCorrection;
+                        action = "(heading < 180 && currentZ < initZ";
+                    } // end of if currentZ < initZ
+                }   //end of if heading == 0
 
 
+                if(heading == 180) {
+                    if (currentZ > initZ) {
+                        RF = RF + zCorrection;
+                        LF = LF - zCorrection;
+                        LR = LR - zCorrection;
+                        RR = RR + zCorrection;
+                        action = "(heading == 0 && currentZ > initZ";
+                    } // end of if currentZ > initZ
+                    if (currentZ < initZ) {
+                        RF = RF - zCorrection;
+                        LF = LF + zCorrection;
+                        LR = LR + zCorrection;
+                        RR = RR - zCorrection;
+                        action = "(heading < 180 && currentZ < initZ";
+                    } // end of if currentZ < initZ
+                } // end of if heading == 180
             } // end of if current != initZ
+
+            /*
+             * Limit the value of the drive motors so that the power does not acceed 100%
+             */
+            if(RF > 1) RF = 1;
+            else if (RF < -1) RF = -1;
+
+            if(LF > 1) LF = 1;
+            else if (LF < -1) LF = -1;
+
+            if(LR > 1) LR = 1;
+            else if (LR < -1) LR = -1;
+
+            if(RR > 1) RR = 1;
+            else if (RR < -1) RR = -1;
 
             /*
              * Apply power to the drive wheels
@@ -73,7 +147,7 @@ public class DriveMechanum {
      * Method getZAngle()
      */
     public double getZAngle(){
-        return (-robot.imu.getAngularOrientation().firstAngle)
+        return (-robot.imu.getAngularOrientation().firstAngle);
     }   // close getZAngle method
 
 
